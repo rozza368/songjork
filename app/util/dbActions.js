@@ -44,6 +44,23 @@ export async function addUser(username, password) {
     [username, hashedPassword]);
 }
 
+export async function isValidCredentials(username, password) {
+  const userInfo = runQuery(
+    "SELECT (username, password_hash) FROM users WHERE username = ?", [username]
+  );
+  if (!userInfo) {
+    return false;
+  }
+  const hashedPassword = userInfo[0]["password_hash"];
+  try {
+    const isValid = await argon2.verify(hashedPassword, password);
+    return isValid;
+  } catch (err) {
+    console.error("argon2 validation failed:", err);
+  }
+  return false;
+}
+
 // JORK ACTIONS
 
 export async function getJorkInfo(jorkId) {}
