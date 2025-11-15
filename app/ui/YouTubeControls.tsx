@@ -11,54 +11,67 @@ function getPlayerTime(element: any): number {
 }
 
 interface NumberInputProps {
+  time: number;
+  labelText: string;
+  setTime: (value: number) => void;
   setPlayerTime: (value: number) => void;
   getPlayerTime: (element: any) => number;
 }
 
-const TimeController: React.FC<NumberInputProps> = ({ setPlayerTime, getPlayerTime }) => {
-  const [startTime, setStartTime] = useState<number>(0);
-  const [endTime, setEndTime] = useState<number>(0);
+interface TimeInputProps {
+  start: number;
+  end: number;
+}
 
+const TimeController: React.FC<NumberInputProps> = ({ time, setTime, labelText, setPlayerTime, getPlayerTime }) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseFloat(event.target.value);
     if (!isNaN(newValue)) {
-      setStartTime(newValue);
+      setTime(newValue);
     }
   };
 
   const setToCurrentTime = () => {
     const currentTime = getPlayerTime(playerElement);
-    setStartTime(Math.round(currentTime * 100) / 100);
+    setTime(Math.round(currentTime * 100) / 100);
   }
 
   return (
-    <>
-      <label htmlFor='startinput'>Start time:</label>
+    <div className='timecontroller'>
+      <label htmlFor='startinput'>{labelText}:</label>
       <input
         id='startinput'
         type='number'
-        value={startTime}
+        value={time}
         onChange={handleChange}
       />
-      <button onClick={(e) => setPlayerTime(startTime)}>Play from here</button>
+      <button onClick={(e) => setPlayerTime(time)}>Play from here</button>
       <button onClick={setToCurrentTime}>Set to current time</button>
+    </div>
+  )
+}
+
+const FinishButton: React.FC<TimeInputProps> = ({ start, end }) => {
+  return (
+    <>
+      <button onClick={(e) => console.log(start, end)}>Finish</button>
+      <p>{start} - {end}</p>
     </>
   )
 }
 
 export default function YouTubeControls() {
+  const [startTime, setStartTime] = useState<number>(0);
+  const [endTime, setEndTime] = useState<number>(0);
   const onPlayerReady: YouTubeProps['onReady'] = (event) => {
     // access to player in all event handlers via event.target
     playerElement = event.target;
     console.log(playerElement);
-    // event.target.pauseVideo();
-    setInterval(() => {
-      getPlayerTime(playerElement);
-    }, 1000);
   }
 
   const setPlayerTime = (time: number) => {
     playerElement.seekTo(time);
+    playerElement.playVideo();
   }
 
   const opts: YouTubeProps['opts'] = {
@@ -78,8 +91,22 @@ export default function YouTubeControls() {
         onReady={onPlayerReady}
       />
       <TimeController
+        time={startTime}
+        setTime={setStartTime}
+        labelText="Start time"
         setPlayerTime={setPlayerTime}
         getPlayerTime={getPlayerTime}
+      />
+      <TimeController
+        time={endTime}
+        setTime={setEndTime}
+        labelText="End time"
+        setPlayerTime={setPlayerTime}
+        getPlayerTime={getPlayerTime}
+      />
+      <FinishButton
+        start={startTime}
+        end={endTime}
       />
     </>
   )
