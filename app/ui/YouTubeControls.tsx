@@ -21,6 +21,7 @@ interface NumberInputProps {
 interface TimeInputProps {
   start: number;
   end: number;
+  submit: (obj: object) => void;
 }
 
 const TimeController: React.FC<NumberInputProps> = ({ time, setTime, labelText, setPlayerTime, getPlayerTime }) => {
@@ -51,13 +52,24 @@ const TimeController: React.FC<NumberInputProps> = ({ time, setTime, labelText, 
   )
 }
 
-const FinishButton: React.FC<TimeInputProps> = ({ start, end }) => {
+const FinishButton: React.FC<TimeInputProps> = ({ start, end, submit }) => {
+  const submitInfo = {
+    start: start,
+    end: end,
+  }
   return (
     <>
-      <button onClick={(e) => console.log(start, end)}>Finish</button>
+      <button onClick={(e) => submit(submitInfo)}>Finish</button>
       <p>{start} - {end}</p>
     </>
   )
+}
+
+async function submitInfo(obj: object) {
+  const response = await fetch("/api/v1/jorks", {
+    method: "POST",
+    body: JSON.stringify(obj),
+  });
 }
 
 export default function YouTubeControls() {
@@ -107,6 +119,7 @@ export default function YouTubeControls() {
       <FinishButton
         start={startTime}
         end={endTime}
+        submit={submitInfo}
       />
     </>
   )
