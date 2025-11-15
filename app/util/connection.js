@@ -54,10 +54,6 @@ export async function dbSetup() {
     await conn.query(sqlCreateUsersTable);
     await conn.query(sqlCreateSongsTable);
     await conn.query(sqlCreateJorksTable);
-
-    // const res = await conn.query("INSERT INTO myTable value (?, ?)", [1, "mariadb"]);
-    // console.log(res); // { affectedRows: 1, insertId: 1, warningStatus: 0 }
-
   } catch (err) {
     throw err;
   } finally {

@@ -6,7 +6,6 @@ export async function GET() {
   try {
     conn = await pool.getConnection();
     const rows = await conn.query("SELECT * FROM jorks");
-    console.log(rows); //[ {val: 1}, meta: ... ]
     return Response.json({ message: rows })
   } catch (err) {
     return Response.json({ message: 'ERROR' })
