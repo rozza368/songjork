@@ -45,8 +45,11 @@ export async function dbSetup() {
         end_time INT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (song_id) REFERENCES songs(song_id),
-        FOREIGN KEY (user_id) REFERENCES users(user_id)
+        FOREIGN KEY (song_id)
+          REFERENCES songs(song_id),
+        FOREIGN KEY (user_id)
+          REFERENCES users(user_id)
+          ON DELETE CASCADE
       );
     `;
 

@@ -1,14 +1,48 @@
-import { pool } from 'connection';
+import { pool } from './connection';
+const argon2 = require('argon2');
+
+async function runQuery(sql, params) {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    let result;
+    if (params) {
+      result = await conn.query(sql, params);
+    }
+    else {
+      result = await conn.query(sql);
+    }
+    return result;
+  } catch (err) {
+    throw err;
+  } finally {
+    if (conn) conn.end();
+  }
+}
 
 // USER ACTIONS
 
-export async function getUserInfo(userId) {}
+export async function getUserInfo(userId) {
+  if (userId) {
+    return runQuery("SELECT * FROM users WHERE user_id = ?", [userId]);
+  }
+  else {
+    return runQuery("SELECT * FROM users");
+  }
+}
 
 export async function updateUserInfo(userId, newInfo) {}
 
-export async function deleteUser(userId) {}
+export async function deleteUser(userId) {
+  return runQuery("DELETE FROM users WHERE user_id = ?", [userId]);
+}
 
-export async function addUser(username, password) {}
+export async function addUser(username, password) {
+  const hashedPassword = await argon2.hash(password);
+  return runQuery(
+    "INSERT INTO users (username, password_hash) VALUE (?, ?)",
+    [username, hashedPassword]);
+}
 
 // JORK ACTIONS
 
