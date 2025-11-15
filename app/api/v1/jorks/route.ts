@@ -1,16 +1,12 @@
-import { pool, dbSetup } from '../../../util/connection';
+import { addJork, getUserInfo } from '@/app/util/dbActions';
 
 export async function GET() {
-  await dbSetup();
-  let conn;
-  try {
-    conn = await pool.getConnection();
-    const rows = await conn.query("SELECT * FROM jorks");
-    return Response.json({ message: rows })
-  } catch (err) {
-    return Response.json({ message: 'ERROR' })
-    // throw err;
-  } finally {
-    if (conn) conn.end();
-  }
+  const userInfo = await getUserInfo();
+  return Response.json({ message: userInfo });
+}
+
+export async function POST(request: Request) {
+  const jorkInfo = await request.json();
+  const result = await addJork(jorkInfo);
+  return Response.json({ message: result });
 }
