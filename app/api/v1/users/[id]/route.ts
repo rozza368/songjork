@@ -7,7 +7,7 @@ export async function GET(
 ) {
   const { id } = await params;
   const rows = await getUserInfo(id);
-  return Response.json({ message: `GET user ID ${id}`, result: rows });
+  return Response.json({ status: "success", message: `GET user ID ${id}`, result: rows });
 }
 
 // update user info
@@ -17,7 +17,7 @@ export async function PUT(
 ) {
   const { id } = await params;
   const result = await updateUserInfo(id, null); // TODO
-  return Response.json({ message: `PUT user ID ${id}` });
+  return Response.json({ status: "success", message: `PUT user ID ${id}` });
 }
 
 // remove user
@@ -27,5 +27,5 @@ export async function DELETE(
 ) {
   const { id } = await params;
   const result = await deleteUser(id);
-  return Response.json({ message: `DELETE user ID ${id}`, result: result });
+  return Response.json({ status: "success", message: `DELETE user ID ${id}`, result: result });
 }
