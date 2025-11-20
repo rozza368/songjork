@@ -20,15 +20,16 @@ export async function dbSetup() {
         username VARCHAR(50) NOT NULL,
         password_hash VARCHAR(97),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        last_login_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        last_login_time TIMESTAMP
       );
     `;
 
     const sqlCreateSongsTable = `
       CREATE TABLE IF NOT EXISTS songs (
         song_id INT AUTO_INCREMENT PRIMARY KEY,
-        title VARCHAR(100),
-        artist VARCHAR(100),
+        title VARCHAR(100) NOT NULL,
+        artist VARCHAR(100) NOT NULL,
         release_date DATETIME,
         duration INT NOT NULL,
         bpm INT,
