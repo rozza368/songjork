@@ -31,14 +31,16 @@ export async function getUserInfo(userId) {
   }
 }
 
-export async function updateUserInfo(userId, newInfo) {}
+export async function updateUserInfo(userId, newInfo) {
+  // TODO
+}
 
 export async function deleteUser(userId) {
   return runQuery("DELETE FROM users WHERE user_id = ?", [userId]);
 }
 
-export async function addUser(username, password) {
-  const hashedPassword = await argon2.hash(password);
+export async function addUser(username, plaintextPassword) {
+  const hashedPassword = await argon2.hash(plaintextPassword);
   return runQuery(
     "INSERT INTO users (username, password_hash) VALUE (?, ?)",
     [username, hashedPassword]);
@@ -63,20 +65,89 @@ export async function isValidCredentials(username, password) {
 
 // JORK ACTIONS
 
-export async function getJorkInfo(jorkId) {}
+export async function getJorkInfo(jorkId) {
+  if (jorkId) {
+    return runQuery("SELECT * FROM jorks WHERE jork_id = ?", [jorkId]);
+  }
+  else {
+    return runQuery("SELECT * FROM jorks");
+  }
+}
 
-export async function updateJorkInfo(jorkId, newInfo) {}
+export async function updateJorkInfo(jorkId, newInfo) {
+  const params = Object.entries(newInfo).flat();
+  const numParams = Object.keys(newInfo).length;
+  if (params.length === 0) return;
 
-export async function deleteJork(jorkId) {}
+  // dodgy but it works
+  const placeholders = [];
+  for (let i = 0; i < numParams; i++) {
+    placeholders.push("? = ?");
+  }
+  const placeholderString = placeholders.join(", ");
 
-export async function addJork(jorkInfo) {}
+  // add ID onto the end
+  params.push(jorkId);
+  return runQuery(`UPDATE jorks SET ${placeholderString} WHERE jork_id = ?`, params);
+}
+
+export async function deleteJork(jorkId) {
+  return runQuery("DELETE FROM jorks WHERE jork_id = ?", [jorkId]);
+}
+
+export async function addJork(jorkInfo) {
+  const { songId, userId, startTime, endTime } = jorkInfo;
+
+  // all parameters must be present
+  if (!songId || !userId || !startTime || !endTime)
+    return null;
+
+  return runQuery(
+    "INSERT INTO jorks (song_id, user_id, start_time, end_time) VALUES (?, ?, ?, ?)",
+    [songId, userId, startTime, endTime]
+  );
+}
 
 // SONG ACTIONS
 
-export async function getSongInfo(songId) {}
+export async function getSongInfo(songId) {
+  if (songId) {
+    return runQuery("SELECT * FROM songs WHERE song_id = ?", [songId]);
+  }
+  else {
+    return runQuery("SELECT * FROM songs");
+  }
+}
 
-export async function updateSongInfo(songId, newInfo) {}
+export async function updateSongInfo(songId, newInfo) {
+  // TODO
+  return runQuery("UPDATE songs SET ? WHERE song_id = ?", [songId]);
+}
 
-export async function deleteSong(songId) {}
+export async function deleteSong(songId) {
+  return runQuery("DELETE FROM songs WHERE song_id = ?", [songId]);
+}
 
-export async function addSong(songInfo) {}
+export async function addSong(songInfo) {
+  const { title, artist, releaseDate, duration, bpm } = songInfo;
+
+  // all parameters must be present
+  if (!title || !artist || !duration)
+    return null;
+
+  const params = {
+    "title": title,
+    "artist": artist,
+    "duration": duration,
+    "release_date": releaseDate,
+    "bpm": bpm,
+  };
+
+  const fields = Object.keys(params);
+  const values = Object.values(params);
+
+  return runQuery(
+    `INSERT INTO songs (${fields}) VALUES (?, ?, ?, ?, ?)`,
+    values
+  );
+}
