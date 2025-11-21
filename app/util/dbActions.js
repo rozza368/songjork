@@ -9,7 +9,19 @@ function createErrorMessage(err) {
   return {status: "error", message: err};
 }
 
+/*
+
+Assumptions:
+- PUT is used to replace data, so we can assume all fields will be provided
+
+*/
+
 // USER ACTIONS
+
+function isAcceptableUsername(username) {
+  // TODO: validate name
+  return true;
+}
 
 export async function getUserInfo(userId) {
   let sql;
@@ -34,8 +46,37 @@ export async function getUserInfo(userId) {
   }
 }
 
-export async function updateUserInfo(userId, newInfo) {
-  // TODO
+export async function updateUserName(userId, newName) {
+  if (!isAcceptableUsername(newName)) {
+    return createErrorMessage("Invalid username");
+  }
+
+  try {
+    const res = await pool.query(
+      "UPDATE users SET username = ? WHERE user_id = ?", [newName, userId]
+    );
+    return createSuccessMessage({
+      affected_rows: res.affectedRows,
+    });
+  }
+  catch (err) {
+    return createErrorMessage(err);
+  }
+}
+
+export async function updateUserPassword(userId, plaintextPassword) {
+  const hashedPassword = await argon2.hash(plaintextPassword);
+  try {
+    const res = await pool.query(
+      "UPDATE users SET password_hash = ? WHERE user_id = ?", [hashedPassword, userId]
+    );
+    return createSuccessMessage({
+      affected_rows: res.affectedRows,
+    });
+  }
+  catch (err) {
+    return createErrorMessage(err);
+  }
 }
 
 export async function deleteUser(userId) {
@@ -52,6 +93,10 @@ export async function deleteUser(userId) {
 }
 
 export async function addUser(username, plaintextPassword) {
+  if (!isAcceptableUsername(newName)) {
+    return createErrorMessage("Invalid username");
+  }
+
   const hashedPassword = await argon2.hash(plaintextPassword);
   try {
     const res = await pool.query(
@@ -116,23 +161,18 @@ export async function getJorkInfo(jorkId) {
   }
 }
 
-export async function updateJorkInfo(jorkId, newInfo) {
-  const params = Object.entries(newInfo).flat();
-  const numParams = Object.keys(newInfo).length;
-  if (params.length === 0) return;
-
-  // dodgy but it works
-  const placeholders = [];
-  for (let i = 0; i < numParams; i++) {
-    placeholders.push("? = ?");
-  }
-  const placeholderString = placeholders.join(", ");
-
-  // add ID onto the end
-  params.push(jorkId);
-
+/**
+ * Edit a jork. Only the start and end time can be modified.
+ * @param {number} jorkId
+ * @param {number} startTime
+ * @param {number} endTime
+ * @returns {object}
+ */
+export async function updateJorkInfo(jorkId, startTime, endTime) {
   try {
-    const res = await pool.query(`UPDATE jorks SET ${placeholderString} WHERE jork_id = ?`, params);
+    const res = await pool.query(
+      "UPDATE jorks SET start_time = ?, end_time = ? WHERE jork_id = ?", [startTime, endTime, jorkId]
+    );
     return createSuccessMessage({
       affected_rows: res.affectedRows,
     });
@@ -201,10 +241,19 @@ export async function getSongInfo(songId) {
   }
 }
 
-export async function updateSongInfo(songId, newInfo) {
-  // TODO
+export async function updateSongInfo(songId, title, artist, releaseDate, duration, bpm, youtubeId) {
   try {
-    const res = await pool.query("UPDATE songs SET ? WHERE song_id = ?", [songId]);
+    const res = await pool.query(
+      `UPDATE songs
+      SET title = ?,
+        artist = ?,
+        release_date = ?,
+        duration = ?,
+        bpm = ?,
+        youtube_id = ?
+      WHERE song_id = ?`,
+      [title, artist, releaseDate, duration, bpm, youtubeId, songId]
+    );
     return createSuccessMessage({
       affected_rows: res.affectedRows,
     });
