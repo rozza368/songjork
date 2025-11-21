@@ -25,13 +25,14 @@ function isAcceptableUsername(username) {
 
 export async function getUserInfo(userId) {
   let sql;
-  let param = [];
+  let param;
   if (userId) {
     sql = "SELECT * FROM users WHERE user_id = ?";
+    param = [userId];
   }
   else {
     sql = "SELECT * FROM users";
-    param.push(userId);
+    param = [];
   }
 
   try {
@@ -93,7 +94,7 @@ export async function deleteUser(userId) {
 }
 
 export async function addUser(username, plaintextPassword) {
-  if (!isAcceptableUsername(newName)) {
+  if (!isAcceptableUsername(username)) {
     return createErrorMessage("Invalid username");
   }
 
@@ -140,13 +141,14 @@ export async function isValidCredentials(username, password) {
 
 export async function getJorkInfo(jorkId) {
   let sql;
-  let param = [];
+  let param;
   if (jorkId) {
     sql = "SELECT * FROM jorks WHERE jork_id = ?";
+    param = [jorkId];
   }
   else {
     sql = "SELECT * FROM jorks";
-    param.push(jorkId);
+    param = [];
   }
 
   try {
@@ -214,13 +216,14 @@ export async function addJork(songId, userId, startTime, endTime) {
 
 export async function getSongInfo(songId) {
   let sql;
-  let param = [];
+  let param;
   if (songId) {
     sql = "SELECT * FROM songs WHERE song_id = ?";
+    param = [songId];
   }
   else {
     sql = "SELECT * FROM songs";
-    param.push(songId);
+    param = [];
   }
 
   try {

@@ -1,12 +1,12 @@
-import { addJork, getUserInfo } from '@/app/util/dbActions';
+import { addJork, getJorkInfo } from '@/app/util/dbActions';
 
 export async function GET() {
-  const userInfo = await getUserInfo();
-  return Response.json({ status: "success", message: userInfo });
+  const jorkInfo = await getJorkInfo();
+  return Response.json(jorkInfo);
 }
 
 export async function POST(request: Request) {
-  const jorkInfo = await request.json();
-  const result = await addJork(jorkInfo);
-  return Response.json({ status: "success", message: result });
+  const { song_id, user_id, start_time, end_time } = await request.json();
+  const result = await addJork(song_id, user_id, start_time, end_time);
+  return Response.json(result);
 }

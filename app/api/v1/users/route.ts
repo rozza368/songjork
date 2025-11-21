@@ -5,16 +5,14 @@ import { type NextRequest } from "next/server";
 export async function GET(
   request: NextRequest
 ) {
-  const rows = await getUserInfo();
+  const userInfo = await getUserInfo();
   const searchParams = request.nextUrl.searchParams;
-  return Response.json({ status: "success", message: rows, params: searchParams.toString() });
+  return Response.json({ ...userInfo, params: searchParams.toString() });
 }
 
 // add a user
 export async function POST(request: Request) {
   const { username, password } = await request.json();
-  console.log(username, password);
   const result = await addUser(username, password);
-  console.log(result);
-  return Response.json({ status: "success", message: result });
+  return Response.json(result);
 }

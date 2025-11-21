@@ -1,3 +1,4 @@
+import { deleteJork, getJorkInfo, updateJorkInfo } from "@/app/util/dbActions";
 import { type NextRequest } from "next/server";
 
 // retrieve info about jork
@@ -7,7 +8,8 @@ export async function GET(
 ) {
   const { id } = await params;
   const searchParams = request.nextUrl.searchParams;
-  return Response.json({ status: "success", message: `GET jork ID ${id}`, params: searchParams.toString() });
+  const jorkInfo = await getJorkInfo(id);
+  return Response.json({...jorkInfo, params: searchParams.toString()});
 }
 
 // update a jork
@@ -16,7 +18,9 @@ export async function PUT(
   { params }: { params: Promise<{ id: number }> }
 ) {
   const { id } = await params;
-  return Response.json({ status: "success", message: `PUT jork ID ${id}` });
+  const { start_time, end_time } = await request.json();
+  const result = await updateJorkInfo(id, start_time, end_time);
+  return Response.json(result);
 }
 
 // delete a jork
@@ -25,5 +29,6 @@ export async function DELETE(
   { params }: { params: Promise<{ id: number }> }
 ) {
   const { id } = await params;
-  return Response.json({ status: "success", message: `DELETE jork ID ${id}` });
+  const result = await deleteJork(id);
+  return Response.json(result);
 }
