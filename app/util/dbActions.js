@@ -195,13 +195,7 @@ export async function deleteJork(jorkId) {
   }
 }
 
-export async function addJork(jorkInfo) {
-  const { songId, userId, startTime, endTime } = jorkInfo;
-
-  // all parameters must be present
-  if (!songId || !userId || !startTime || !endTime)
-    return null;
-
+export async function addJork(songId, userId, startTime, endTime) {
   try {
     const res = await pool.query(
       "INSERT INTO jorks (song_id, user_id, start_time, end_time) VALUES (?, ?, ?, ?)",
@@ -276,28 +270,11 @@ export async function deleteSong(songId) {
   }
 }
 
-export async function addSong(songInfo) {
-  const { title, artist, releaseDate, duration, bpm } = songInfo;
-
-  // these parameters must be present
-  if (!title || !artist || !duration)
-    return null;
-
-  const params = {
-    "title": title,
-    "artist": artist,
-    "duration": duration,
-    "release_date": releaseDate,
-    "bpm": bpm,
-  };
-
-  const fields = Object.keys(params);
-  const values = Object.values(params);
-
+export async function addSong(title, artist, releaseDate, duration, bpm, youtubeId) {
   try {
     const res = await pool.query(
-      `INSERT INTO songs (${fields.join(", ")}) VALUES (?, ?, ?, ?, ?)`,
-      values
+      `INSERT INTO songs (title, artist, release_date, duration, bpm, youtube_id) VALUES (?, ?, ?, ?, ?)`,
+      [title, artist, releaseDate, duration, bpm, youtubeId]
     );
     return createSuccessMessage({
       affected_rows: res.affectedRows,
