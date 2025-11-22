@@ -101,10 +101,12 @@ export async function addUser(username, plaintextPassword) {
   const hashedPassword = await argon2.hash(plaintextPassword);
   try {
     const res = await pool.query(
-      "INSERT INTO users (username, password_hash) VALUE (?, ?)",
+      "INSERT INTO users (username, password_hash) VALUE (?, ?) RETURNING user_id",
       [username, hashedPassword]
     );
+    const { user_id } = res[0];
     return createSuccessMessage({
+      user_id: user_id,
       affected_rows: res.affectedRows,
     });
   }
@@ -200,10 +202,12 @@ export async function deleteJork(jorkId) {
 export async function addJork(songId, userId, startTime, endTime) {
   try {
     const res = await pool.query(
-      "INSERT INTO jorks (song_id, user_id, start_time, end_time) VALUES (?, ?, ?, ?)",
+      "INSERT INTO jorks (song_id, user_id, start_time, end_time) VALUES (?, ?, ?, ?) RETURNING jork_id",
       [songId, userId, startTime, endTime]
     );
+    const { jork_id } = res[0];
     return createSuccessMessage({
+      jork_id: jork_id,
       affected_rows: res.affectedRows,
     });
   }
@@ -276,10 +280,12 @@ export async function deleteSong(songId) {
 export async function addSong(title, artist, releaseDate, duration, bpm, youtubeId) {
   try {
     const res = await pool.query(
-      `INSERT INTO songs (title, artist, release_date, duration, bpm, youtube_id) VALUES (?, ?, ?, ?, ?)`,
+      `INSERT INTO songs (title, artist, release_date, duration, bpm, youtube_id) VALUES (?, ?, ?, ?, ?) RETURNING song_id`,
       [title, artist, releaseDate, duration, bpm, youtubeId]
     );
+    const { song_id } = res[0];
     return createSuccessMessage({
+      song_id: song_id,
       affected_rows: res.affectedRows,
     });
   }
