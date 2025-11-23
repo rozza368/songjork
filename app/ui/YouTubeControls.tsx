@@ -54,8 +54,8 @@ const TimeController: React.FC<NumberInputProps> = ({ time, setTime, labelText, 
 
 const FinishButton: React.FC<TimeInputProps> = ({ start, end, submit }) => {
   const submitInfo = {
-    start: start,
-    end: end,
+    start_time: start,
+    end_time: end,
   }
   return (
     <>
