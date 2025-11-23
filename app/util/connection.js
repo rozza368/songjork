@@ -31,7 +31,7 @@ export async function dbSetup() {
         title VARCHAR(100) NOT NULL,
         artist VARCHAR(100) NOT NULL,
         release_date DATETIME,
-        duration INT NOT NULL,
+        duration FLOAT NOT NULL,
         bpm INT,
         youtube_id VARCHAR(11)
       );
@@ -42,8 +42,8 @@ export async function dbSetup() {
         jork_id INT AUTO_INCREMENT PRIMARY KEY,
         song_id INT,
         user_id INT,
-        start_time INT,
-        end_time INT,
+        start_time FLOAT,
+        end_time FLOAT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (song_id)
